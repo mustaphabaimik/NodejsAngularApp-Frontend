@@ -23,7 +23,7 @@ export class CartComponent implements OnInit {
 
 
   ChangeQuantity(id: Number, increaseQuantity: Boolean) {
-    //alert(increaseQuantity);
+   
     this.cartService.UpdateCartData(id, increaseQuantity);
   }
 

@@ -46,9 +46,9 @@ export class CartService {
       let info: CartModelPublic = JSON.parse(localStorage.getItem('cart'));
 
     if (info !== null && info !== undefined && info.prodData[0].itcart !== 0) {
-      // assign the value to our data variable which corresponds to the LocalStorage data format
+      
       this.cartDataClient = info;
-      // Loop through each entry and put it in the cartDataServer object
+     
       this.cartDataClient.prodData.forEach(p => {
         this.produitService.getOneProduct(p.id).subscribe((actualProdInfo: ProduitModel) => {
           if (this.cartDataServer.data[0].nbrItemCart === 0) {
@@ -66,7 +66,7 @@ export class CartService {
             this.cartDataClient.total = this.cartDataServer.total;
             localStorage.setItem('cart', JSON.stringify(this.cartDataClient));
           }
-          this.cartDataObs$.next({...this.cartDataServer});
+          this.cartDataObs$.next(this.cartDataServer);
         });
       });
     }
@@ -77,7 +77,7 @@ export class CartService {
   AddProductToCart(id: Number, quantity?: number) {
 
     this.produitService.getOneProduct(id).subscribe(prod => {
-      // If the cart is empty
+      // si la carte est vide
       if (this.cartDataServer.data[0].product === undefined) {
         this.cartDataServer.data[0].product = prod;
         this.cartDataServer.data[0].nbrItemCart = quantity !== undefined ? quantity : 1;
@@ -86,23 +86,23 @@ export class CartService {
         this.cartDataClient.prodData[0].id = prod.id;
         this.cartDataClient.total = this.cartDataServer.total;
         localStorage.setItem('cart', JSON.stringify(this.cartDataClient));
-        this.cartDataObs$.next({...this.cartDataServer});
+        this.cartDataObs$.next(this.cartDataServer);
         this.toastr.success(`${prod.name} added to the cart.`, "Product Added", {
           timeOut: 1500,
           progressBar: true,
           progressAnimation: 'increasing',
           positionClass: 'toast-top-right'
         })
-      }  // END of IF
-      // Cart is not empty
+      }  
+      // Carte non vide
       else {
         let index = this.cartDataServer.data.findIndex(p => p.product.id === prod.id);
 
-        // 1. If chosen product is already in cart array
+        // 1. si le produit est deja dans la carte 
         if (index !== -1) {
 
           if (quantity !== undefined && quantity <= prod.quantity) {
-            // @ts-ignore
+           
             this.cartDataServer.data[index].nbrItemCart = this.cartDataServer.data[index].nbrItemCart < prod.quantity ? quantity : prod.quantity;
           } else {
             // @ts-ignore
@@ -119,7 +119,7 @@ export class CartService {
             positionClass: 'toast-top-full-width'
           })
         }
-        // 2. If chosen product is not in cart array
+        // 2. si la carte ne contient pas le produit 
         else {
           this.cartDataServer.data.push({
             product: prod,
@@ -140,8 +140,8 @@ export class CartService {
         this.CalculateTotal();
         this.cartDataClient.total = this.cartDataServer.total;
         localStorage.setItem('cart', JSON.stringify(this.cartDataClient));
-        this.cartDataObs$.next({...this.cartDataServer});
-      }  // END of ELSE
+        this.cartDataObs$.next(this.cartDataServer);
+      }  
 
 
     });
@@ -156,20 +156,20 @@ export class CartService {
       this.cartDataClient.prodData[index].itcart = data.nbrItemCart;
       this.CalculateTotal();
       this.cartDataClient.total = this.cartDataServer.total;
-      this.cartDataObs$.next({...this.cartDataServer});
+      this.cartDataObs$.next(this.cartDataServer);
       localStorage.setItem('cart', JSON.stringify(this.cartDataClient));
     } else {
       // @ts-ignore
       data.nbrItemCart--;
       
 
-      // @ts-ignore
+      
       if (data.nbrItemCart < 1) {
         this.DeleteProductFromCart(index);
-        this.cartDataObs$.next({...this.cartDataServer});
+        this.cartDataObs$.next(this.cartDataServer);
       } else {
-        // @ts-ignore
-        this.cartDataObs$.next({...this.cartDataServer});
+        
+        this.cartDataObs$.next(this.cartDataServer);
         this.cartDataClient.prodData[index].itcart = data.nbrItemCart;
         this.CalculateTotal();
         this.cartDataClient.total = this.cartDataServer.total;
@@ -182,9 +182,7 @@ export class CartService {
 
 
   DeleteProductFromCart(index) {
-    /*    console.log(this.cartDataClient.prodData[index].prodId);
-        console.log(this.cartDataServer.data[index].product.id);*/
-
+    
     if (window.confirm('Are you sure you want to delete the item?')) {
       this.cartDataServer.data.splice(index, 1);
       this.cartDataClient.prodData.splice(index, 1);
@@ -206,12 +204,12 @@ export class CartService {
           }],
           total: 0
         };
-        this.cartDataObs$.next({...this.cartDataServer});
+        this.cartDataObs$.next(this.cartDataServer);
       } else {
-        this.cartDataObs$.next({...this.cartDataServer});
+        this.cartDataObs$.next(this.cartDataServer);
       }
     }
-    // If the user doesn't want to delete the product, hits the CANCEL button
+    
     else{
      
       this.router.navigate(['/']);
